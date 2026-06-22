@@ -1,0 +1,272 @@
+/* ============================================
+   HelpPoint - CSS Global
+   ============================================ */
+
+:root {
+    --cor-primaria: #0d6efd;
+    --cor-secundaria: #6c757d;
+    --cor-sucesso: #198754;
+    --cor-perigo: #dc3545;
+    --cor-aviso: #ffc107;
+    --cor-fundo: #f8f9fa;
+    --cor-texto: #212529;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    min-height: 100vh;
+}
+
+/* Login */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--cor-primaria), #0b5ed7);
+}
+
+.login-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.login-card h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--cor-primaria);
+}
+
+/* Conteudo principal */
+.main-content {
+    padding: 2rem 0;
+}
+
+/* Placeholder das paginas em construcao */
+.placeholder-page {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--cor-secundaria);
+}
+
+.placeholder-page i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+/* ============================================
+   ADMIN - Layout com Sidebar
+   ============================================ */
+
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: 250px;
+    background: #1e293b;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #334155;
+    text-align: center;
+}
+
+.sidebar-header h4 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.sidebar-header small {
+    color: #94a3b8;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0.5rem 0;
+    margin: 0;
+    flex: 1;
+}
+
+.sidebar-menu li a {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.sidebar-menu li a:hover {
+    background: #334155;
+    color: #fff;
+}
+
+.sidebar-menu li.active a {
+    background: var(--cor-primaria);
+    color: #fff;
+}
+
+.sidebar-menu li a i {
+    margin-right: 0.5rem;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #334155;
+}
+
+.sidebar-user {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-user i {
+    margin-right: 0.3rem;
+}
+
+.sidebar-logout {
+    color: #f87171;
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+
+.sidebar-logout:hover {
+    color: #fca5a5;
+}
+
+/* Conteudo ao lado da sidebar */
+.admin-content {
+    margin-left: 250px;
+    flex: 1;
+    padding: 2rem;
+    background: var(--cor-fundo);
+}
+
+/* Header das paginas admin */
+.admin-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.admin-page-header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+/* Tabela CRUD */
+.crud-table {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.crud-table .table {
+    margin: 0;
+}
+
+.crud-table .table th {
+    background: #f1f5f9;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+/* Cards do dashboard admin */
+.stats-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.stats-card .stats-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.stats-card .stats-number {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.stats-card .stats-label {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   CLIENTE - Sidebar com cor diferente
+   ============================================ */
+
+.client-sidebar {
+    background: #0f4c75;
+}
+
+.client-sidebar .sidebar-header {
+    border-bottom: 1px solid #1b6fa8;
+}
+
+.client-sidebar .sidebar-menu li a:hover {
+    background: #1b6fa8;
+}
+
+.client-sidebar .sidebar-footer {
+    border-top: 1px solid #1b6fa8;
+}
+
+/* Responsivo - sidebar */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 70px;
+    }
+    .admin-sidebar .sidebar-header h4,
+    .admin-sidebar .sidebar-header small,
+    .admin-sidebar .sidebar-menu li a span,
+    .admin-sidebar .sidebar-footer .sidebar-user span {
+        display: none;
+    }
+    .admin-sidebar .sidebar-menu li a {
+        text-align: center;
+        padding: 1rem;
+    }
+    .admin-sidebar .sidebar-menu li a i {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+    .admin-content {
+        margin-left: 70px;
+    }
+}
