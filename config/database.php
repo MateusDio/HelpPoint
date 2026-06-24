@@ -7,7 +7,7 @@
 // ============================================
 
 $host = 'localhost';
-$dbname = 'teste-helpPoint';       // TODO: definir com a equipe
+$dbname = 'chamadobanco';       // TODO: definir com a equipe
 $username = 'root';           // padrão do XAMPP
 $password = '';                   // padrão do XAMPP (sem senha)
 
