@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../../includes/global/auth.php';
 redirectIfNotLogged();
 if (isAdmin()) {
@@ -10,6 +11,7 @@ $currentPage = 'categorias';
 require_once __DIR__ . '/../../includes/global/header.php';
 require_once __DIR__ . '/../../includes/user/sidebar.php';
 ?>
+
 
 <div class="admin-page-header">
     <h1><i class="bi bi-tags"></i> Categorias</h1>
