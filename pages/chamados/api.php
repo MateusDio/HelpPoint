@@ -1,136 +1,126 @@
 <?php
-// ============================================================
-//  HELP POINT — API REST simples
-//  GET  api.php?acao=chamados          → lista chamados ativos
-//  GET  api.php?acao=servicos          → lista serviços
-//  POST api.php?acao=novo_chamado      → cria chamado
-//  POST api.php?acao=fechar_chamado    → fecha chamado (id no body)
-// ============================================================
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../includes/global/auth.php';
+redirectIfNotLogged();
 
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
 
-require_once 'db.php';
+$acao   = $_GET['acao'] ?? '';
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-$acao = $_GET['acao'] ?? '';
+function responder(array $dados): void {
+    echo json_encode($dados, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
+function erro(string $mensagem, int $http = 400): void {
+    http_response_code($http);
+    responder(['sucesso' => false, 'erro' => $mensagem]);
+}
+
+function bodyJson(): array {
+    $raw = file_get_contents('php://input');
+    $dados = json_decode($raw, true);
+    return is_array($dados) ? $dados : [];
+}
 
 try {
-    $pdo = getDB();
+    match ($acao) {
+        'servicos'       => listarServicos($pdo),
+        'chamados'       => listarChamados($pdo),
+        'novo_chamado'   => novoChamado($pdo),
+        'fechar_chamado' => fecharChamado($pdo),
+        default          => erro('Ação inválida.', 404),
+    };
+} catch (Throwable $e) {
+    erro('Erro interno: ' . $e->getMessage(), 500);
+}
 
-    // --------------------------------------------------------
-    // GET: listar chamados ativos
-    // --------------------------------------------------------
-    if ($acao === 'chamados' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-        $stmt = $pdo->query("
-            SELECT
-                c.id,
-                c.titulo,
-                c.prioridade,
-                c.status,
-                c.local,
-                c.data_abertura,
-                s.nome  AS servico,
-                u.nome  AS solicitante,
-                t.nome  AS tecnico
-            FROM chamados c
-            JOIN servicos  s ON s.id = c.servico_id
-            JOIN usuarios  u ON u.id = c.usuario_id
-            LEFT JOIN usuarios t ON t.id = c.tecnico_id
-            WHERE c.status NOT IN ('resolvido','fechado')
-            ORDER BY
-                FIELD(c.prioridade,'critico','alto','medio','baixo'),
-                c.data_abertura DESC
-            LIMIT 50
-        ");
-        echo json_encode(['sucesso' => true, 'dados' => $stmt->fetchAll()]);
-        exit;
-    }
+// ── Listar serviços ativos ───────────────────────────────────────────────────
+function listarServicos(PDO $pdo): void {
+    $stmt = $pdo->query("SELECT id, nome FROM servicos WHERE ativo = 1 ORDER BY nome");
+    responder(['sucesso' => true, 'dados' => $stmt->fetchAll()]);
+}
 
-    // --------------------------------------------------------
-    // GET: listar serviços
-    // --------------------------------------------------------
-    if ($acao === 'servicos' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-        $stmt = $pdo->query("SELECT id, nome FROM servicos WHERE ativo = 1 ORDER BY nome");
-        echo json_encode(['sucesso' => true, 'dados' => $stmt->fetchAll()]);
-        exit;
-    }
+// ── Listar chamados abertos do usuário logado ────────────────────────────────
+function listarChamados(PDO $pdo): void {
+    $usuario_id = $_SESSION['usuario_id'] ?? 0;
 
-    // --------------------------------------------------------
-    // POST: criar novo chamado
-    // --------------------------------------------------------
-    if ($acao === 'novo_chamado' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        $body = json_decode(file_get_contents('php://input'), true);
+    $stmt = $pdo->prepare("
+        SELECT
+            c.id,
+            c.titulo,
+            c.prioridade,
+            c.status,
+            c.local,
+            c.data_abertura,
+            s.nome AS servico,
+            u.nome AS usuario
+        FROM chamados c
+        JOIN servicos s ON s.id = c.servico_id
+        JOIN usuarios u ON u.id = c.usuario_id
+        WHERE c.usuario_id = ?
+          AND c.status NOT IN ('resolvido', 'fechado')
+        ORDER BY
+            FIELD(c.prioridade, 'critico', 'alto', 'medio', 'baixo'),
+            c.data_abertura DESC
+    ");
+    $stmt->execute([$usuario_id]);
+    responder(['sucesso' => true, 'dados' => $stmt->fetchAll()]);
+}
 
-        $titulo     = trim($body['titulo']     ?? '');
-        $descricao  = trim($body['descricao']  ?? '');
-        $prioridade = $body['prioridade']       ?? 'baixo';
-        $local      = trim($body['local']       ?? '');
-        $servico_id = (int)($body['servico_id'] ?? 0);
-        $usuario_id = (int)($body['usuario_id'] ?? 1); // padrão: usuário 1 (demo)
+// ── Abrir novo chamado ───────────────────────────────────────────────────────
+function novoChamado(PDO $pdo): void {
+    $body = bodyJson();
 
-        // Validações básicas
-        if (!$titulo || !$local || !$servico_id) {
-            http_response_code(400);
-            echo json_encode(['sucesso' => false, 'erro' => 'Título, local e serviço são obrigatórios.']);
-            exit;
-        }
+    $titulo     = trim($body['titulo']     ?? '');
+    $descricao  = trim($body['descricao']  ?? '');
+    $prioridade = trim($body['prioridade'] ?? 'baixo');
+    $local      = trim($body['local']      ?? '');
+    $servico_id = (int) ($body['servico_id'] ?? 0);
+    $usuario_id = $_SESSION['usuario_id'] ?? 0;
 
-        $prioridades_validas = ['baixo', 'medio', 'alto', 'critico'];
-        if (!in_array($prioridade, $prioridades_validas)) {
-            $prioridade = 'baixo';
-        }
+    if ($titulo === '')    erro('Título é obrigatório.');
+    if ($local  === '')    erro('Local é obrigatório.');
+    if ($servico_id <= 0)  erro('Serviço inválido.');
+    if ($usuario_id <= 0)  erro('Sessão inválida. Faça login novamente.', 401);
+    if (!in_array($prioridade, ['baixo','medio','alto','critico'], true))
+                           erro('Prioridade inválida.');
 
-        $stmt = $pdo->prepare("
-            INSERT INTO chamados (titulo, descricao, prioridade, local, usuario_id, servico_id)
-            VALUES (:titulo, :descricao, :prioridade, :local, :usuario_id, :servico_id)
-        ");
-        $stmt->execute([
-            ':titulo'     => $titulo,
-            ':descricao'  => $descricao,
-            ':prioridade' => $prioridade,
-            ':local'      => $local,
-            ':usuario_id' => $usuario_id,
-            ':servico_id' => $servico_id,
-        ]);
+    $stmt = $pdo->prepare("
+        INSERT INTO chamados (titulo, descricao, prioridade, local, usuario_id, servico_id)
+        VALUES (:titulo, :descricao, :prioridade, :local, :usuario_id, :servico_id)
+    ");
+    $stmt->execute([
+        ':titulo'      => $titulo,
+        ':descricao'   => $descricao,
+        ':prioridade'  => $prioridade,
+        ':local'       => $local,
+        ':usuario_id'  => $usuario_id,
+        ':servico_id'  => $servico_id,
+    ]);
 
-        $novo_id = $pdo->lastInsertId();
+    responder(['sucesso' => true, 'id' => (int) $pdo->lastInsertId()]);
+}
 
-        // Registrar no histórico
-        $pdo->prepare("
-            INSERT INTO historico (chamado_id, usuario_id, campo_alterado, valor_anterior, valor_novo)
-            VALUES (:cid, :uid, 'status', NULL, 'aberto')
-        ")->execute([':cid' => $novo_id, ':uid' => $usuario_id]);
+// ── Fechar chamado (só o dono pode fechar o seu) ────────────────────────────
+function fecharChamado(PDO $pdo): void {
+    $body = bodyJson();
+    $id   = (int) ($body['id'] ?? 0);
+    $usuario_id = $_SESSION['usuario_id'] ?? 0;
 
-        echo json_encode(['sucesso' => true, 'id' => $novo_id, 'mensagem' => 'Chamado aberto com sucesso!']);
-        exit;
-    }
+    if ($id <= 0)         erro('ID inválido.');
+    if ($usuario_id <= 0) erro('Sessão inválida.', 401);
 
-    // --------------------------------------------------------
-    // POST: fechar chamado
-    // --------------------------------------------------------
-    if ($acao === 'fechar_chamado' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        $body = json_decode(file_get_contents('php://input'), true);
-        $id   = (int)($body['id'] ?? 0);
+    $stmt = $pdo->prepare("
+        UPDATE chamados
+        SET status = 'fechado'
+        WHERE id = ? AND usuario_id = ? AND status NOT IN ('resolvido','fechado')
+    ");
+    $stmt->execute([$id, $usuario_id]);
 
-        if (!$id) {
-            http_response_code(400);
-            echo json_encode(['sucesso' => false, 'erro' => 'ID inválido.']);
-            exit;
-        }
+    if ($stmt->rowCount() === 0)
+        erro('Chamado não encontrado ou já encerrado.');
 
-        $pdo->prepare("
-            UPDATE chamados SET status = 'fechado', data_resolucao = NOW() WHERE id = :id
-        ")->execute([':id' => $id]);
-
-        echo json_encode(['sucesso' => true, 'mensagem' => 'Chamado fechado.']);
-        exit;
-    }
-
-    // Ação não encontrada
-    http_response_code(404);
-    echo json_encode(['sucesso' => false, 'erro' => 'Ação não encontrada.']);
-
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['sucesso' => false, 'erro' => 'Erro no banco: ' . $e->getMessage()]);
+    responder(['sucesso' => true, 'id' => $id]);
 }
