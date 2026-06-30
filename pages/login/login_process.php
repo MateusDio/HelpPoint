@@ -35,8 +35,8 @@ $_SESSION['user_role'] = $user['role'];
 
 // Redirecionar por role
 if ($user['role'] === 'admin') {
-    header('Location: /HelpPoint/pages/admin/dashboard.php');
+    header('Location: ' . BASE_URL . '/pages/admin/dashboard.php');
 } else {
-    header('Location: /HelpPoint/pages/dashboard/index.php');
+    header('Location: ' . BASE_URL . '/pages/dashboard/index.php');
 }
 exit();

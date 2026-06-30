@@ -6,7 +6,7 @@ $__inicial = strtoupper(mb_substr($__nomeAdmin, 0, 1));
     <!-- Linha 1: logo + ações -->
     <div class="topbar-row topbar-row-top">
         <div class="topbar-inner">
-            <a href="/HelpPoint/pages/admin/dashboard.php" class="topbar-logo">
+            <a href="<?= BASE_URL ?>/pages/admin/dashboard.php" class="topbar-logo">
                 <i class="bi bi-headset"></i>
                 <span>HelpPoint</span>
                 <small>Admin</small>
@@ -25,7 +25,7 @@ $__inicial = strtoupper(mb_substr($__nomeAdmin, 0, 1));
                             <small class="text-muted">Administrador</small>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="/HelpPoint/pages/login/logout.php"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
+                        <li><a class="dropdown-item text-danger" href="<?= BASE_URL ?>/pages/login/logout.php"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
                     </ul>
                 </div>
             </div>
@@ -38,12 +38,12 @@ $__inicial = strtoupper(mb_substr($__nomeAdmin, 0, 1));
             <nav class="topbar-nav">
                 <?php
                 $items = [
-                    ['key'=>'dashboard',    'url'=>'/HelpPoint/pages/admin/dashboard.php',     'icon'=>'bi-grid',          'label'=>'Dashboard'],
-                    ['key'=>'chamados',     'url'=>'/HelpPoint/pages/admin/chamados.php',      'icon'=>'bi-ticket',        'label'=>'Chamados'],
-                    ['key'=>'categorias',   'url'=>'/HelpPoint/pages/admin/categorias.php',    'icon'=>'bi-tags',          'label'=>'Categorias'],
-                    ['key'=>'equipamentos', 'url'=>'/HelpPoint/pages/admin/equipamentos.php',  'icon'=>'bi-pc-display',    'label'=>'Equipamentos'],
-                    ['key'=>'tipos',        'url'=>'/HelpPoint/pages/admin/tipos.php',         'icon'=>'bi-list-check',    'label'=>'Tipos'],
-                    ['key'=>'usuarios',     'url'=>'/HelpPoint/pages/admin/usuarios.php',      'icon'=>'bi-people',        'label'=>'Usuarios'],
+                    ['key'=>'dashboard',    'url'=>BASE_URL.'/pages/admin/dashboard.php',     'icon'=>'bi-grid',          'label'=>'Dashboard'],
+                    ['key'=>'chamados',     'url'=>BASE_URL.'/pages/admin/chamados.php',      'icon'=>'bi-ticket',        'label'=>'Chamados'],
+                    ['key'=>'categorias',   'url'=>BASE_URL.'/pages/admin/categorias.php',    'icon'=>'bi-tags',          'label'=>'Categorias'],
+                    ['key'=>'equipamentos', 'url'=>BASE_URL.'/pages/admin/equipamentos.php',  'icon'=>'bi-pc-display',    'label'=>'Equipamentos'],
+                    ['key'=>'tipos',        'url'=>BASE_URL.'/pages/admin/tipos.php',         'icon'=>'bi-list-check',    'label'=>'Tipos'],
+                    ['key'=>'usuarios',     'url'=>BASE_URL.'/pages/admin/usuarios.php',      'icon'=>'bi-people',        'label'=>'Usuarios'],
                 ];
                 foreach ($items as $it):
                     $active = ($currentPage ?? '') === $it['key'] ? 'active' : '';

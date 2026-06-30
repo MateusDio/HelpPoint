@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../includes/global/auth.php';
 require_once __DIR__ . '/../../config/database.php';
 redirectIfNotLogged();
 if (isAdmin()) {
-    header('Location: /HelpPoint/pages/admin/equipamentos.php');
+    header('Location: ' . BASE_URL . '/pages/admin/equipamentos.php');
     exit();
 }
 $pageTitle = 'Equipamentos';

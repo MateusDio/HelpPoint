@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../includes/global/auth.php';
 require_once __DIR__ . '/../../config/database.php';
 redirectIfNotLogged();
 if (isAdmin()) {
-    header('Location: /HelpPoint/pages/admin/dashboard.php');
+    header('Location: ' . BASE_URL . '/pages/admin/dashboard.php');
     exit();
 }
 $pageTitle = 'Dashboard';

@@ -14,7 +14,7 @@ $pageTitle = 'Entrar';
     <title>Entrar - HelpPoint</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/HelpPoint/assets/css/style.css?v=<?= @filemtime(__DIR__ . '/../../assets/css/style.css') ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css?v=<?= @filemtime(__DIR__ . '/../../assets/css/style.css') ?>">
 </head>
 <body>
 
@@ -26,7 +26,7 @@ $pageTitle = 'Entrar';
 
             <!-- FORM: LOGIN -->
             <div class="auth-form-box" data-form="login">
-                <a href="/HelpPoint/" class="auth-brand">
+                <a href="<?= BASE_URL ?>/" class="auth-brand">
                     <i class="bi bi-headset"></i> HelpPoint
                 </a>
 
@@ -70,7 +70,7 @@ $pageTitle = 'Entrar';
 
             <!-- FORM: REGISTRO -->
             <div class="auth-form-box" data-form="registro">
-                <a href="/HelpPoint/" class="auth-brand">
+                <a href="<?= BASE_URL ?>/" class="auth-brand">
                     <i class="bi bi-headset"></i> HelpPoint
                 </a>
 

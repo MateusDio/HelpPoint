@@ -1,6 +1,16 @@
 <?php
 session_start();
 
+// URL base do projeto (auto-detecta XAMPP local vs hospedagem)
+if (!defined('BASE_URL')) {
+    $__host = $_SERVER['HTTP_HOST'] ?? '';
+    if (strpos($__host, 'localhost') !== false || strpos($__host, '127.0.0.1') !== false) {
+        define('BASE_URL', '/HelpPoint');
+    } else {
+        define('BASE_URL', '');
+    }
+}
+
 // Verifica se o usuário está logado
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
@@ -14,7 +24,7 @@ function isAdmin() {
 // Redireciona para o login se não estiver logado
 function redirectIfNotLogged() {
     if (!isLoggedIn()) {
-        header('Location: /HelpPoint/pages/login/index.php');
+        header('Location: ' . BASE_URL . '/pages/login/index.php');
         exit();
     }
 }
@@ -23,9 +33,9 @@ function redirectIfNotLogged() {
 function redirectIfLogged() {
     if (isLoggedIn()) {
         if (isAdmin()) {
-            header('Location: /HelpPoint/pages/admin/dashboard.php');
+            header('Location: ' . BASE_URL . '/pages/admin/dashboard.php');
         } else {
-            header('Location: /HelpPoint/pages/dashboard/index.php');
+            header('Location: ' . BASE_URL . '/pages/dashboard/index.php');
         }
         exit();
     }
@@ -35,7 +45,7 @@ function redirectIfLogged() {
 function redirectIfNotAdmin() {
     redirectIfNotLogged();
     if (!isAdmin()) {
-        header('Location: /HelpPoint/pages/dashboard/index.php');
+        header('Location: ' . BASE_URL . '/pages/dashboard/index.php');
         exit();
     }
 }

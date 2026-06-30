@@ -10,7 +10,7 @@ $__inicialCli = strtoupper(mb_substr($__me['nome'] ?? 'C', 0, 1));
     <!-- Linha 1: logo + perfil -->
     <div class="topbar-row topbar-row-top">
         <div class="topbar-inner">
-            <a href="/HelpPoint/pages/dashboard/" class="topbar-logo">
+            <a href="<?= BASE_URL ?>/pages/dashboard/" class="topbar-logo">
                 <i class="bi bi-headset"></i>
                 <span>HelpPoint</span>
                 <small class="topbar-tag-cli">Cliente</small>
@@ -33,10 +33,10 @@ $__inicialCli = strtoupper(mb_substr($__me['nome'] ?? 'C', 0, 1));
     <div class="topbar-row topbar-row-nav">
         <div class="topbar-inner">
             <nav class="topbar-nav">
-                <a href="/HelpPoint/pages/dashboard/" class="<?= ($currentPage ?? '') === 'dashboard' ? 'active' : '' ?>">
+                <a href="<?= BASE_URL ?>/pages/dashboard/" class="<?= ($currentPage ?? '') === 'dashboard' ? 'active' : '' ?>">
                     <i class="bi bi-grid"></i> <span>Inicio</span>
                 </a>
-                <a href="/HelpPoint/pages/chamados/" class="<?= ($currentPage ?? '') === 'chamados' ? 'active' : '' ?>">
+                <a href="<?= BASE_URL ?>/pages/chamados/" class="<?= ($currentPage ?? '') === 'chamados' ? 'active' : '' ?>">
                     <i class="bi bi-ticket"></i> <span>Chamados</span>
                 </a>
             </nav>
@@ -63,7 +63,7 @@ $__inicialCli = strtoupper(mb_substr($__me['nome'] ?? 'C', 0, 1));
                         <div class="config-email"><?= htmlspecialchars($__me['email']) ?></div>
                     </div>
                 </div>
-                <form action="/HelpPoint/pages/perfil/perfil_process.php" method="POST" class="mt-3">
+                <form action="<?= BASE_URL ?>/pages/perfil/perfil_process.php" method="POST" class="mt-3">
                     <input type="hidden" name="funcao" value="">
                     <input type="hidden" name="documento" value="">
                     <div class="mb-2">
@@ -81,10 +81,10 @@ $__inicialCli = strtoupper(mb_substr($__me['nome'] ?? 'C', 0, 1));
                     <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-check2"></i> Salvar</button>
                 </form>
                 <hr>
-                <a href="/HelpPoint/pages/perfil/" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                <a href="<?= BASE_URL ?>/pages/perfil/" class="btn btn-outline-secondary btn-sm w-100 mb-2">
                     <i class="bi bi-person-circle"></i> Perfil completo
                 </a>
-                <a href="/HelpPoint/pages/login/logout.php" class="btn btn-outline-danger btn-sm w-100">
+                <a href="<?= BASE_URL ?>/pages/login/logout.php" class="btn btn-outline-danger btn-sm w-100">
                     <i class="bi bi-box-arrow-right"></i> Sair
                 </a>
             </div>
