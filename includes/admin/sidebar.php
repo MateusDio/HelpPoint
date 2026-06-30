@@ -1,62 +1,62 @@
-<div class="admin-wrapper">
-    <!-- Sidebar -->
-    <nav class="admin-sidebar">
-        <div class="sidebar-header">
-            <h4><i class="bi bi-headset"></i> HelpPoint</h4>
-            <small>Painel Admin</small>
-        </div>
-        <ul class="sidebar-menu">
-            <li class="<?php echo ($currentPage ?? '') === 'dashboard' ? 'active' : ''; ?>">
-                <a href="/HelpPoint/pages/admin/dashboard.php">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
-            </li>
-            <li class="<?php echo ($currentPage ?? '') === 'chamados' ? 'active' : ''; ?>">
-                <a href="/HelpPoint/pages/admin/chamados.php">
-                    <i class="bi bi-ticket"></i> Chamados
-                </a>
-            </li>
-            <li class="<?php echo ($currentPage ?? '') === 'categorias' ? 'active' : ''; ?>">
-                <a href="/HelpPoint/pages/admin/categorias.php">
-                    <i class="bi bi-tags"></i> Categorias
-                </a>
-            </li>
-            <li class="<?php echo ($currentPage ?? '') === 'equipamentos' ? 'active' : ''; ?>">
-                <a href="/HelpPoint/pages/admin/equipamentos.php">
-                    <i class="bi bi-pc-display"></i> Equipamentos
-                </a>
-            </li>
-            <li class="<?php echo ($currentPage ?? '') === 'tipos' ? 'active' : ''; ?>">
-                <a href="/HelpPoint/pages/admin/tipos.php">
-                    <i class="bi bi-list-check"></i> Tipos
-                </a>
-            </li>
-            <li class="<?php echo ($currentPage ?? '') === 'usuarios' ? 'active' : ''; ?>">
-                <a href="/HelpPoint/pages/admin/usuarios.php">
-                    <i class="bi bi-people"></i> Usuarios
-                </a>
-            </li>
-            <li class="<?php echo ($currentPage ?? '') === 'relatorios' ? 'active' : ''; ?>">
-                <a href="/HelpPoint/pages/admin/relatorios.php">
-                    <i class="bi bi-bar-chart-line"></i> Relatorios
-                </a>
-            </li>
-            <li class="<?php echo ($currentPage ?? '') === 'configuracoes' ? 'active' : ''; ?>">
-                <a href="/HelpPoint/pages/admin/configuracoes.php">
-                    <i class="bi bi-gear"></i> Configuracoes
-                </a>
-            </li>
-        </ul>
-        <div class="sidebar-footer">
-            <div class="sidebar-user">
-                <i class="bi bi-person-circle"></i>
-                <span><?php echo htmlspecialchars($_SESSION['user_nome']); ?></span>
-            </div>
-            <a href="/HelpPoint/pages/login/logout.php" class="sidebar-logout">
-                <i class="bi bi-box-arrow-right"></i> Sair
+<?php
+$__nomeAdmin = $_SESSION['user_nome'] ?? 'Admin';
+$__inicial = strtoupper(mb_substr($__nomeAdmin, 0, 1));
+?>
+<header class="topbar">
+    <!-- Linha 1: logo + ações -->
+    <div class="topbar-row topbar-row-top">
+        <div class="topbar-inner">
+            <a href="/HelpPoint/pages/admin/dashboard.php" class="topbar-logo">
+                <i class="bi bi-headset"></i>
+                <span>HelpPoint</span>
+                <small>Admin</small>
             </a>
-        </div>
-    </nav>
 
-    <!-- Conteudo principal -->
-    <main class="admin-content">
+            <div class="topbar-actions">
+                <div class="dropdown">
+                    <button type="button" class="topbar-profile" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="topbar-avatar"><?= htmlspecialchars($__inicial) ?></div>
+                        <span class="topbar-profile-name"><?= htmlspecialchars($__nomeAdmin) ?></span>
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li class="dropdown-header">
+                            <strong><?= htmlspecialchars($__nomeAdmin) ?></strong><br>
+                            <small class="text-muted">Administrador</small>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="/HelpPoint/pages/login/logout.php"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Linha 2: menu -->
+    <div class="topbar-row topbar-row-nav">
+        <div class="topbar-inner">
+            <nav class="topbar-nav">
+                <?php
+                $items = [
+                    ['key'=>'dashboard',    'url'=>'/HelpPoint/pages/admin/dashboard.php',     'icon'=>'bi-grid',          'label'=>'Dashboard'],
+                    ['key'=>'chamados',     'url'=>'/HelpPoint/pages/admin/chamados.php',      'icon'=>'bi-ticket',        'label'=>'Chamados'],
+                    ['key'=>'categorias',   'url'=>'/HelpPoint/pages/admin/categorias.php',    'icon'=>'bi-tags',          'label'=>'Categorias'],
+                    ['key'=>'equipamentos', 'url'=>'/HelpPoint/pages/admin/equipamentos.php',  'icon'=>'bi-pc-display',    'label'=>'Equipamentos'],
+                    ['key'=>'tipos',        'url'=>'/HelpPoint/pages/admin/tipos.php',         'icon'=>'bi-list-check',    'label'=>'Tipos'],
+                    ['key'=>'usuarios',     'url'=>'/HelpPoint/pages/admin/usuarios.php',      'icon'=>'bi-people',        'label'=>'Usuarios'],
+                ];
+                foreach ($items as $it):
+                    $active = ($currentPage ?? '') === $it['key'] ? 'active' : '';
+                ?>
+                <a href="<?= $it['url'] ?>" class="<?= $active ?>">
+                    <i class="bi <?= $it['icon'] ?>"></i>
+                    <span><?= $it['label'] ?></span>
+                </a>
+                <?php endforeach; ?>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main class="topbar-content">
+    <div class="topbar-container">

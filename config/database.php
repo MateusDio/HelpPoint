@@ -7,7 +7,7 @@
 // ============================================
 
 $host = 'localhost';
-$dbname = 'equipamento';       // TODO: definir com a equipe
+$dbname = 'teste';       // TODO: definir com a equipe
 $username = 'root';           // padrão do XAMPP
 $password = '';                   // padrão do XAMPP (sem senha)
 
