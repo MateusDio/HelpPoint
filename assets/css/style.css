@@ -431,17 +431,140 @@ body:has(.auth-split) {
 .auth-feedback-author span { color: #64748b; }
 
 /* Responsivo */
+/* ===== Responsivo Auth (login/cadastro) ===== */
 @media (max-width: 900px) {
+    body:has(.auth-split) { overflow: auto; }
+
     .auth-split {
-        flex-direction: column;
         height: auto;
         min-height: 100vh;
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
     }
-    .auth-form-side { flex: 0 0 auto; min-width: 0; }
-    .auth-visual-side { min-height: 380px; }
-    .auth-visual-main { padding: 2rem; }
-    .auth-visual-title { font-size: 1.7rem; }
-    body:has(.auth-split) { overflow: auto; }
+
+    .auth-form-side,
+    .auth-visual-side {
+        position: relative;
+        left: 0;
+        width: 100%;
+        height: auto;
+        transform: none !important;
+    }
+
+    .auth-form-side {
+        min-width: 0;
+        padding: 2rem 1.25rem;
+        order: 1;
+    }
+
+    .auth-form-stage {
+        position: relative;
+        max-width: 420px;
+        margin: 0 auto;
+        height: auto;
+        min-height: 480px;
+        display: block;
+    }
+
+    .auth-form-box {
+        top: 0;
+        transform: translateX(0) !important;
+        position: relative;
+    }
+
+    .auth-form-box[data-form="registro"] {
+        display: none;
+    }
+
+    .modo-registro .auth-form-box[data-form="login"] {
+        display: none;
+    }
+
+    .modo-registro .auth-form-box[data-form="registro"] {
+        display: block;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .auth-visual-side {
+        order: 2;
+        min-height: 360px;
+    }
+
+    .auth-visual-main { padding: 2rem 1.25rem; min-height: 240px; }
+    .auth-visual-title { font-size: 1.6rem; }
+
+    .auth-marquee { height: 75px; }
+    .auth-feedback-text { max-width: 220px; }
+}
+
+@media (max-width: 480px) {
+    .auth-form-side { padding: 1.5rem 1rem; }
+    .auth-title { font-size: 1.35rem; }
+    .auth-visual-side { min-height: 320px; }
+    .auth-feedback { padding: 0.4rem 0.8rem 0.4rem 0.4rem; }
+    .auth-feedback-text { max-width: 180px; font-size: 0.78rem; }
+}
+
+/* ===== Responsivo Topbar (admin/cliente) ===== */
+@media (max-width: 992px) {
+    .topbar-inner { padding: 0 1rem; }
+    .topbar-nav { gap: 0; }
+    .topbar-nav a { padding: 0.85rem 0.7rem; font-size: 0.85rem; }
+}
+
+@media (max-width: 768px) {
+    .topbar-row-top .topbar-inner { height: 58px; }
+    .topbar-logo { font-size: 1rem; }
+    .topbar-logo i { font-size: 1.2rem; }
+    .topbar-logo small { display: none; }
+
+    .topbar-profile { padding: 0.25rem; border-radius: 50%; }
+    .topbar-profile-name,
+    .topbar-profile-info,
+    .topbar-profile i.bi-chevron-down { display: none; }
+
+    .topbar-container { padding: 1.25rem 1rem; }
+    .topbar-content-cliente .topbar-container { padding: 1.25rem 1rem; }
+
+    .topbar-row-nav .topbar-inner { padding: 0 0.5rem; }
+    .topbar-nav { padding: 0 0.5rem; }
+    .topbar-nav a span { display: none; }
+    .topbar-nav a { padding: 0.75rem 0.85rem; font-size: 1.05rem; }
+    .topbar-nav a i { font-size: 1.1rem; margin: 0; }
+
+    .admin-page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    .admin-page-header h1 { font-size: 1.2rem; }
+    .admin-page-header > form,
+    .admin-page-header > button,
+    .admin-page-header > a { width: 100%; }
+
+    .crud-table { overflow-x: auto; }
+    .crud-table .table { min-width: 600px; }
+    .stats-card { padding: 1rem; }
+    .stats-card .stats-number { font-size: 1.5rem; }
+
+    .chamado-grid { grid-template-columns: 1fr; }
+    .chamado-card-foot { flex-direction: column; align-items: flex-start; }
+    .chamado-actions { width: 100%; justify-content: stretch; }
+    .chamado-actions .btn { flex: 1; }
+
+    .nivel-options { flex-direction: column; }
+    .modal-dialog { margin: 0.5rem; }
+
+    .config-user-card { padding: 0.5rem; }
+}
+
+@media (max-width: 480px) {
+    .topbar-nav a { padding: 0.65rem 0.5rem; font-size: 1rem; }
+    .topbar-container { padding: 1rem 0.75rem; }
+    .admin-page-header h1 { font-size: 1.1rem; }
+    .cat-cards { max-height: 50vh; }
 }
 
 /* Conteudo principal */
