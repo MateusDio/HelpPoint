@@ -1,7 +1,16 @@
 <?php
+require_once __DIR__ . '/../phpmailer/src/Exception.php';
+require_once __DIR__ . '/../phpmailer/src/PHPMailer.php';
+require_once __DIR__ . '/../phpmailer/src/SMTP.php';
 // Configuração de email para verificação
 define('MAIL_FROM_EMAIL', 'helppoint@helppoint.com');
 define('MAIL_FROM_NAME', 'HelpPoint');
+
+define('SMTP_HOST', '');
+define('SMTP_PORT', 587);
+define('SMTP_USERNAME', '');
+define('SMTP_PASSWORD', '');
+define('SMTP_SECURE', 'tls');
 
 function gerarUrlAbsoluta($path) {
     $host = $_SERVER['HTTP_HOST'] ?? '';
@@ -14,6 +23,43 @@ function gerarUrlAbsoluta($path) {
     }
 
     return $scheme . '://' . $host . BASE_URL . $path;
+}
+
+function enviarEmailHtml($destinatario, $assunto, $mensagem) {
+    if (SMTP_HOST !== '' && SMTP_USERNAME !== '' && SMTP_PASSWORD !== '') {
+        try {
+            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host = SMTP_HOST;
+            $mail->SMTPAuth = true;
+            $mail->Username = SMTP_USERNAME;
+            $mail->Password = SMTP_PASSWORD;
+            $mail->SMTPSecure = SMTP_SECURE;
+            $mail->Port = SMTP_PORT;
+            $mail->CharSet = 'UTF-8';
+
+            $mail->setFrom(MAIL_FROM_EMAIL, MAIL_FROM_NAME);
+            $mail->addAddress($destinatario);
+            $mail->addReplyTo(MAIL_FROM_EMAIL, MAIL_FROM_NAME);
+
+            $mail->isHTML(true);
+            $mail->Subject = $assunto;
+            $mail->Body = $mensagem;
+            $mail->AltBody = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $mensagem));
+
+            return $mail->send();
+        } catch (\PHPMailer\PHPMailer\Exception $e) {
+            error_log('Erro PHPMailer: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    $headers = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-type: text/html; charset=UTF-8\r\n";
+    $headers .= "From: " . MAIL_FROM_NAME . " <" . MAIL_FROM_EMAIL . ">\r\n";
+    $headers .= "Reply-To: " . MAIL_FROM_EMAIL . "\r\n";
+
+    return @mail($destinatario, $assunto, $mensagem, $headers);
 }
 
 // Para usar com servidor SMTP ou serviço de email
@@ -76,13 +122,7 @@ function enviarEmailVerificacao($destinatario, $nome, $token) {
     </html>
     ";
     
-    $headers = "MIME-Version: 1.0\r\n";
-    $headers .= "Content-type: text/html; charset=UTF-8\r\n";
-    $headers .= "From: " . MAIL_FROM_NAME . " <" . MAIL_FROM_EMAIL . ">\r\n";
-    $headers .= "Reply-To: " . MAIL_FROM_EMAIL . "\r\n";
-    
-    // Se tiver configurado SMTP, use aqui. Por enquanto, usaremos mail()
-    return @mail($destinatario, $assunto, $mensagem, $headers);
+    return enviarEmailHtml($destinatario, $assunto, $mensagem);
 }
 
 /**
@@ -169,12 +209,7 @@ function enviarEmailRedefinicaoSenha($destinatario, $nome, $token) {
     </html>
     ";
     
-    $headers = "MIME-Version: 1.0\r\n";
-    $headers .= "Content-type: text/html; charset=UTF-8\r\n";
-    $headers .= "From: " . MAIL_FROM_NAME . " <" . MAIL_FROM_EMAIL . ">\r\n";
-    $headers .= "Reply-To: " . MAIL_FROM_EMAIL . "\r\n";
-    
-    return @mail($destinatario, $assunto, $mensagem, $headers);
+    return enviarEmailHtml($destinatario, $assunto, $mensagem);
 }
 
 /**
