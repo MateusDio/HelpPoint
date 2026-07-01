@@ -1,0 +1,6 @@
+.env
+.env.local
+uploads/chamados/*
+uploads/avatars/*
+!uploads/.htaccess
+!uploads/*/.gitkeep

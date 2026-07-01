@@ -37,10 +37,12 @@ if ($acao === 'criar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Processar anexos se houver
     if (isset($_FILES['anexos']) && is_array($_FILES['anexos']['name'])) {
         $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'doc', 'docx'];
         $uploadDir = __DIR__ . '/../../uploads/chamados';
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
+            mkdir($uploadDir, 0755, true);
         }
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
 
         for ($i = 0; $i < min(count($_FILES['anexos']['name']), 5); $i++) {
             if ($_FILES['anexos']['error'][$i] !== UPLOAD_ERR_OK) continue;
@@ -51,13 +53,11 @@ if ($acao === 'criar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($size > 5 * 1024 * 1024) continue;
 
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mime = finfo_file($finfo, $tmpName);
-            finfo_close($finfo);
-
-            if (!in_array($mime, $allowedMimes, true)) continue;
-
             $ext = strtolower(pathinfo($nomeOriginal, PATHINFO_EXTENSION));
+
+            if (!in_array($mime, $allowedMimes, true) || !in_array($ext, $allowedExts, true)) continue;
+
             $nomeArquivo = 'anexo_' . $chamadoId . '_' . $userId . '_' . time() . '_' . $i . '.' . $ext;
             $targetPath = $uploadDir . '/' . $nomeArquivo;
 
@@ -73,6 +73,7 @@ if ($acao === 'criar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
             }
         }
+        finfo_close($finfo);
     }
 
     header('Location: index.php?sucesso=criado');

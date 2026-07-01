@@ -71,8 +71,8 @@ require_once __DIR__ . '/../../includes/global/header.php';
             <i class="bi bi-envelope-check"></i> Verificação de Email
         </h2>
         
-        <div class="alert alert-<?= $tipo_alerta ?>" role="alert">
-            <?= $mensagem ?>
+        <div class="alert alert-<?= htmlspecialchars($tipo_alerta) ?>" role="alert">
+            <?= htmlspecialchars($mensagem) ?>
         </div>
         
         <hr>

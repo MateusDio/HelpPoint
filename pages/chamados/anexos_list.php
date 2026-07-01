@@ -19,7 +19,7 @@ if (!$chamado) {
     exit();
 }
 
-if (!isAdmin() && $chamado['user_id'] !== $userId) {
+if (!isAdmin() && (int)$chamado['user_id'] !== $userId) {
     exit();
 }
 
@@ -50,14 +50,14 @@ foreach ($anexos as $a):
             <i class="bi <?= $icon ?>"></i>
             <div>
                 <small class="d-block">
-                    <a href="<?= $uploadUrl . $a['nome_arquivo'] ?>" target="_blank" class="text-decoration-none">
+                    <a href="<?= htmlspecialchars($uploadUrl . $a['nome_arquivo']) ?>" target="_blank" class="text-decoration-none">
                         <?= htmlspecialchars($a['nome_original']) ?>
                     </a>
                 </small>
                 <small class="text-muted d-block"><?= number_format($a['tamanho'] / 1024, 1) ?> KB</small>
             </div>
         </div>
-        <?php if (isAdmin() || $a['user_id'] === $userId): ?>
+        <?php if (isAdmin() || (int)$a['user_id'] === $userId): ?>
             <a href="anexos_process.php?acao=excluir_anexo&id=<?= $a['id'] ?>" onclick="return confirm('Tem certeza?')" class="btn btn-sm btn-danger">
                 <i class="bi bi-trash"></i>
             </a>

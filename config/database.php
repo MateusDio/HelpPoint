@@ -2,27 +2,27 @@
 // ============================================
 // CONFIGURAÇÃO DO BANCO DE DADOS
 // ============================================
-// TODO: Definir nome do banco, usuário e senha
-// com a equipe antes de rodar o projeto.
+// Valores sensiveis vem do arquivo .env (nao versionado).
+// Veja .env.example para modelo.
 // ============================================
 
-// Detecta ambiente: local (XAMPP) vs produção (hospedagem)
+require_once __DIR__ . '/env.php';
+
 $__host_atual = $_SERVER['HTTP_HOST'] ?? '';
 $__is_local = (strpos($__host_atual, 'localhost') !== false || strpos($__host_atual, '127.0.0.1') !== false);
 
 if ($__is_local) {
-    // === XAMPP LOCAL ===
-    $host = 'localhost';
-    $dbname = 'teste';
-    $username = 'root';
-    $password = '';
+    // === XAMPP LOCAL (defaults; sobrescriva no .env se necessario) ===
+    $host = env('DB_HOST', 'localhost');
+    $dbname = env('DB_NAME', 'teste');
+    $username = env('DB_USER', 'root');
+    $password = env('DB_PASS', '');
 } else {
-    // === PRODUÇÃO (InfinityFree) ===
-    // TODO: preencher com os dados que o painel da hospedagem mostrar
-    $host = 'sqlXXX.infinityfree.com';
-    $dbname = 'if0_XXXXXXX_helppoint';
-    $username = 'if0_XXXXXXX';
-    $password = 'sua_senha_aqui';
+    // === PRODUÇÃO — obrigatorio ter .env preenchido ===
+    $host = env('DB_HOST', '');
+    $dbname = env('DB_NAME', '');
+    $username = env('DB_USER', '');
+    $password = env('DB_PASS', '');
 }
 
 try {

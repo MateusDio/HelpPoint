@@ -1,16 +1,18 @@
 <?php
+require_once __DIR__ . '/env.php';
 require_once __DIR__ . '/../phpmailer/src/Exception.php';
 require_once __DIR__ . '/../phpmailer/src/PHPMailer.php';
 require_once __DIR__ . '/../phpmailer/src/SMTP.php';
-// Configuração de email para verificação
-define('MAIL_FROM_EMAIL', 'helppoint@helppoint.com');
-define('MAIL_FROM_NAME', 'HelpPoint');
 
-define('SMTP_HOST', '');
-define('SMTP_PORT', 587);
-define('SMTP_USERNAME', '');
-define('SMTP_PASSWORD', '');
-define('SMTP_SECURE', 'tls');
+// Config de email — valores vem do .env (veja .env.example)
+define('MAIL_FROM_EMAIL', env('MAIL_FROM_EMAIL', 'helppoint@helppoint.com'));
+define('MAIL_FROM_NAME', env('MAIL_FROM_NAME', 'HelpPoint'));
+
+define('SMTP_HOST', env('SMTP_HOST', ''));
+define('SMTP_PORT', (int)env('SMTP_PORT', 587));
+define('SMTP_USERNAME', env('SMTP_USERNAME', ''));
+define('SMTP_PASSWORD', env('SMTP_PASSWORD', ''));
+define('SMTP_SECURE', env('SMTP_SECURE', 'tls'));
 
 function gerarUrlAbsoluta($path) {
     $host = $_SERVER['HTTP_HOST'] ?? '';
@@ -54,12 +56,18 @@ function enviarEmailHtml($destinatario, $assunto, $mensagem) {
         }
     }
 
+    error_log('Aviso: SMTP nao configurado — usando mail() como fallback para ' . $destinatario);
+
     $headers = "MIME-Version: 1.0\r\n";
     $headers .= "Content-type: text/html; charset=UTF-8\r\n";
     $headers .= "From: " . MAIL_FROM_NAME . " <" . MAIL_FROM_EMAIL . ">\r\n";
     $headers .= "Reply-To: " . MAIL_FROM_EMAIL . "\r\n";
 
-    return @mail($destinatario, $assunto, $mensagem, $headers);
+    $ok = mail($destinatario, $assunto, $mensagem, $headers);
+    if (!$ok) {
+        error_log('Falha ao enviar email via mail() para ' . $destinatario);
+    }
+    return $ok;
 }
 
 // Para usar com servidor SMTP ou serviço de email

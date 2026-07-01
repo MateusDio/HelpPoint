@@ -36,10 +36,11 @@ $pageTitle = 'Entrar';
                 <p class="auth-subtitle">Entre na sua conta para acompanhar chamados.</p>
 
                 <?php if ($erro === 'credenciais'): ?>
-                    <div class="alert alert-danger py-2">Email ou senha incorretos.</div>
-                <?php elseif ($erro === 'email_nao_verificado'): ?>
-                    <div class="alert alert-warning py-2">
-                        <i class="bi bi-exclamation-triangle"></i> Por favor, verifique seu email para ativar a conta.
+                    <div class="alert alert-danger py-2">
+                        Email ou senha incorretos.
+                        <div class="small mt-1">
+                            Nao verificou seu email ainda? <a href="confirm_email.php">Reenviar verificacao</a>.
+                        </div>
                     </div>
                 <?php elseif ($erro === 'campos' && $modo !== 'registro'): ?>
                     <div class="alert alert-danger py-2">Preencha todos os campos.</div>

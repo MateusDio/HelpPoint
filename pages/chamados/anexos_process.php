@@ -23,7 +23,7 @@ if ($acao === 'upload_anexo' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: index.php?erro=chamado_nao_encontrado');
         exit();
     }
-    if (!isAdmin() && $chamado['user_id'] !== $userId) {
+    if (!isAdmin() && (int)$chamado['user_id'] !== $userId) {
         header('Location: index.php?erro=acesso_negado');
         exit();
     }
@@ -41,20 +41,21 @@ if ($acao === 'upload_anexo' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $size = (int)$_FILES['anexo']['size'];
     $nomeOriginal = $_FILES['anexo']['name'];
     $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'doc', 'docx'];
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mime = finfo_file($finfo, $tmpName);
     finfo_close($finfo);
+    $ext = strtolower(pathinfo($nomeOriginal, PATHINFO_EXTENSION));
 
-    if ($size > 5 * 1024 * 1024 || !in_array($mime, $allowedMimes, true)) {
+    if ($size > 5 * 1024 * 1024 || !in_array($mime, $allowedMimes, true) || !in_array($ext, $allowedExts, true)) {
         header('Location: index.php?erro=arquivo_invalido');
         exit();
     }
 
-    $ext = strtolower(pathinfo($nomeOriginal, PATHINFO_EXTENSION));
     $nomeArquivo = 'anexo_' . $chamado_id . '_' . $userId . '_' . time() . '.' . $ext;
     $uploadDir = __DIR__ . '/../../uploads/chamados';
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+        mkdir($uploadDir, 0755, true);
     }
 
     $targetPath = $uploadDir . '/' . $nomeArquivo;
@@ -93,7 +94,7 @@ if ($acao === 'excluir_anexo' && isset($_GET['id'])) {
     }
 
     // Validar permissão (é o dono do anexo ou é admin)
-    if (!isAdmin() && $anexo['user_id'] !== $userId && $anexo['chamado_user'] !== $userId) {
+    if (!isAdmin() && (int)$anexo['user_id'] !== $userId && (int)$anexo['chamado_user'] !== $userId) {
         header('Location: index.php?erro=acesso_negado');
         exit();
     }

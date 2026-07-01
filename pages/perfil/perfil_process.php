@@ -28,31 +28,45 @@ if ($stmt->fetch()) {
     exit();
 }
 
+// Buscar avatar atual do usuario para excluir se for substituido
+$stmt = $pdo->prepare("SELECT avatar FROM user WHERE id = :id LIMIT 1");
+$stmt->execute(['id' => $userId]);
+$avatarAtual = $stmt->fetchColumn();
+
 $avatarName = null;
 if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
     $tmpName = $_FILES['avatar']['tmp_name'];
     $size = (int)$_FILES['avatar']['size'];
     $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mime = finfo_file($finfo, $tmpName);
     finfo_close($finfo);
+    $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
 
-    if ($size > 2 * 1024 * 1024 || !in_array($mime, $allowedTypes, true)) {
+    if ($size > 2 * 1024 * 1024 || !in_array($mime, $allowedTypes, true) || !in_array($ext, $allowedExts, true)) {
         header('Location: index.php?erro=avatar');
         exit();
     }
 
-    $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
     $avatarName = 'avatar_' . $userId . '_' . time() . '.' . $ext;
     $uploadDir = __DIR__ . '/../../uploads/avatars';
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+        mkdir($uploadDir, 0755, true);
     }
 
     $targetPath = $uploadDir . '/' . $avatarName;
     if (!move_uploaded_file($tmpName, $targetPath)) {
         header('Location: index.php?erro=avatar');
         exit();
+    }
+
+    // Excluir avatar anterior, se existir e for um nome seguro dentro de uploads/avatars
+    if (!empty($avatarAtual) && strpbrk($avatarAtual, "/\\") === false) {
+        $antigo = $uploadDir . '/' . $avatarAtual;
+        if (is_file($antigo)) {
+            @unlink($antigo);
+        }
     }
 }
 

@@ -1,0 +1,13 @@
+# Bloqueia execucao de qualquer script no diretorio de uploads
+<FilesMatch "\.(ph(p[3457]?|t|tml|ar)|htaccess|htm|html|shtml|cgi|pl|py|jsp|asp|aspx|sh|bash)$">
+    Require all denied
+</FilesMatch>
+
+# Desabilita engine PHP mesmo se algum ambiente ignorar o FilesMatch
+php_flag engine off
+
+# Nao permitir listagem de diretorio
+Options -Indexes -ExecCGI
+
+# Forcar tipo texto para prevenir sniffing
+AddType text/plain .php .php3 .php4 .php5 .php7 .pht .phtml .phar

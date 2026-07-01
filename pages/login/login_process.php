@@ -39,7 +39,9 @@ $stmt->execute(['uid' => $user['id']]);
 $verificacao = $stmt->fetch();
 
 if ($verificacao && $verificacao['verificado_em'] === null) {
-    header('Location: index.php?erro=email_nao_verificado');
+    // Nao revelar que a senha estava correta. Usar mesmo erro generico do login;
+    // o usuario legitimo tem o link "Reenviar verificacao" na propria tela de login.
+    header('Location: index.php?erro=credenciais');
     exit();
 }
 
