@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-$email = trim($_POST['email'] ?? '');
+$email = strtolower(trim($_POST['email'] ?? ''));
 $senha = $_POST['senha'] ?? '';
 
 // Validar campos
@@ -27,8 +27,18 @@ if (!$user || !password_verify($senha, $user['senha'])) {
     exit();
 }
 
-// Verificar se email foi confirmado
-if (empty($user['email'])) {
+// Verificar se o cadastro por email foi confirmado.
+// Usuarios criados pelo admin nao possuem registro em email_verification e podem entrar normalmente.
+$stmt = $pdo->prepare("
+    SELECT verificado_em
+    FROM email_verification
+    WHERE user_id = :uid
+    LIMIT 1
+");
+$stmt->execute(['uid' => $user['id']]);
+$verificacao = $stmt->fetch();
+
+if ($verificacao && $verificacao['verificado_em'] === null) {
     header('Location: index.php?erro=email_nao_verificado');
     exit();
 }

@@ -3,6 +3,19 @@
 define('MAIL_FROM_EMAIL', 'helppoint@helppoint.com');
 define('MAIL_FROM_NAME', 'HelpPoint');
 
+function gerarUrlAbsoluta($path) {
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['SERVER_PORT'] ?? '') === '443');
+    $scheme = $https ? 'https' : 'http';
+
+    if ($host === '') {
+        return BASE_URL . $path;
+    }
+
+    return $scheme . '://' . $host . BASE_URL . $path;
+}
+
 // Para usar com servidor SMTP ou serviço de email
 // Você pode usar um serviço como SendGrid, Mailtrap, Gmail SMTP, etc.
 // Por padrão, utilizaremos mail() do PHP
@@ -15,7 +28,7 @@ define('MAIL_FROM_NAME', 'HelpPoint');
  * @return bool True se enviado com sucesso
  */
 function enviarEmailVerificacao($destinatario, $nome, $token) {
-    $link_verificacao = BASE_URL . '/pages/login/verify_email.php?token=' . urlencode($token);
+    $link_verificacao = gerarUrlAbsoluta('/pages/login/verify_email.php?token=' . urlencode($token));
     
     $assunto = 'Confirme seu email - HelpPoint';
     
@@ -79,9 +92,10 @@ function enviarEmailVerificacao($destinatario, $nome, $token) {
  */
 function validarTokenVerificacao($token, $pdo) {
     $stmt = $pdo->prepare("
-        SELECT id, user_id, email_temporario, expira_em, verificado_em
-        FROM email_verification
-        WHERE token = :token
+        SELECT ev.id, ev.user_id, ev.email_temporario, ev.expira_em, ev.verificado_em, u.email AS user_email
+        FROM email_verification ev
+        INNER JOIN user u ON u.id = ev.user_id
+        WHERE ev.token = :token
         LIMIT 1
     ");
     $stmt->execute(['token' => $token]);
@@ -112,7 +126,7 @@ function validarTokenVerificacao($token, $pdo) {
  * @return bool True se enviado com sucesso
  */
 function enviarEmailRedefinicaoSenha($destinatario, $nome, $token) {
-    $link_reset = BASE_URL . '/pages/login/reset_password.php?token=' . urlencode($token);
+    $link_reset = gerarUrlAbsoluta('/pages/login/reset_password.php?token=' . urlencode($token));
     $assunto = 'Redefinição de senha - HelpPoint';
     
     $mensagem = "

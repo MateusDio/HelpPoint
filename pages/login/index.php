@@ -45,10 +45,12 @@ $pageTitle = 'Entrar';
                     <div class="alert alert-danger py-2">Preencha todos os campos.</div>
                 <?php endif; ?>
 
-                <?php if (isset($_GET['sucesso'])): ?>
-                    <div class="alert alert-success py-2">Cadastro feito! Faca login.</div>
-                <?php elseif ($sucesso === 'senha_redefinida'): ?>
+                <?php if ($sucesso === 'senha_redefinida'): ?>
                     <div class="alert alert-success py-2">Senha redefinida com sucesso! Faça login.</div>
+                <?php elseif ($sucesso === 'email_verificado'): ?>
+                    <div class="alert alert-success py-2">Email ja verificado. Faca login.</div>
+                <?php elseif (isset($_GET['sucesso'])): ?>
+                    <div class="alert alert-success py-2">Cadastro feito! Faca login.</div>
                 <?php endif; ?>
 
                 <form action="login_process.php" method="POST" class="auth-form">
@@ -88,6 +90,8 @@ $pageTitle = 'Entrar';
 
                 <?php if ($erro === 'campos' && $modo === 'registro'): ?>
                     <div class="alert alert-danger py-2">Preencha todos os campos.</div>
+                <?php elseif ($erro === 'email_invalido'): ?>
+                    <div class="alert alert-danger py-2">Informe um email valido.</div>
                 <?php elseif ($erro === 'email_existe'): ?>
                     <div class="alert alert-danger py-2">Este email ja esta cadastrado.</div>
                 <?php elseif ($erro === 'senhas'): ?>

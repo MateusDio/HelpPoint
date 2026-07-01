@@ -25,10 +25,22 @@ if (!$token) {
         try {
             $pdo->beginTransaction();
             
-            // Atualizar email do usuário
-            $stmt = $pdo->prepare("UPDATE user SET email = :email WHERE id = :id");
+            $emailVerificado = strtolower(trim($validacao['email_temporario']));
+
+            $stmt = $pdo->prepare("SELECT id FROM user WHERE email = :email AND id != :id LIMIT 1");
             $stmt->execute([
-                'email' => $validacao['email_temporario'],
+                'email' => $emailVerificado,
+                'id' => $validacao['user_id']
+            ]);
+
+            if ($stmt->fetch()) {
+                throw new Exception('Este email ja esta vinculado a outra conta.');
+            }
+
+            // Corrige usuarios antigos que ficaram com email vazio no fluxo anterior.
+            $stmt = $pdo->prepare("UPDATE user SET email = :email WHERE id = :id AND (email = '' OR email IS NULL)");
+            $stmt->execute([
+                'email' => $emailVerificado,
                 'id' => $validacao['user_id']
             ]);
             
@@ -74,7 +86,7 @@ require_once __DIR__ . '/../../includes/global/header.php';
         </p>
         
         <div class="text-center">
-            <a href="login.php" class="btn btn-primary">
+            <a href="index.php" class="btn btn-primary">
                 <i class="bi bi-box-arrow-in-right"></i> Ir para Login
             </a>
         </div>

@@ -9,13 +9,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $nome = trim($_POST['nome'] ?? '');
-$email = trim($_POST['email'] ?? '');
+$email = strtolower(trim($_POST['email'] ?? ''));
 $senha = $_POST['senha'] ?? '';
 $confirmar_senha = $_POST['confirmar_senha'] ?? '';
 
 // Validar campos
 if (empty($nome) || empty($email) || empty($senha) || empty($confirmar_senha)) {
     header('Location: register.php?erro=campos');
+    exit();
+}
+
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    header('Location: register.php?erro=email_invalido');
     exit();
 }
 
@@ -36,11 +41,12 @@ if ($stmt->fetch()) {
 try {
     $pdo->beginTransaction();
     
-    // Inserir usuario com email vazio (pendente verificacao)
+    // Inserir usuario com email real. A confirmacao fica registrada em email_verification.
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare("INSERT INTO user (nome, email, senha, role) VALUES (:nome, '', :senha, 'user')");
+    $stmt = $pdo->prepare("INSERT INTO user (nome, email, senha, role) VALUES (:nome, :email, :senha, 'user')");
     $stmt->execute([
         'nome' => $nome,
+        'email' => $email,
         'senha' => $senhaHash
     ]);
     
@@ -67,13 +73,8 @@ try {
     // Enviar email de verificacao
     $enviado = enviarEmailVerificacao($email, $nome, $token);
     
-    if ($enviado) {
-        header('Location: register.php?sucesso=verificacao_enviada');
-    } else {
-        // Email nao foi enviado, mas o registro foi criado
-        // Você pode tentar reenviar depois
-        header('Location: register.php?aviso=email_nao_enviado');
-    }
+    // Redirecionar para página de confirmação (independente se email foi enviado ou não)
+    header('Location: confirm_email.php?email=' . urlencode($email));
     exit();
     
 } catch (Exception $e) {
