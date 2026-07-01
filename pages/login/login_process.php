@@ -27,6 +27,12 @@ if (!$user || !password_verify($senha, $user['senha'])) {
     exit();
 }
 
+// Verificar se email foi confirmado
+if (empty($user['email'])) {
+    header('Location: index.php?erro=email_nao_verificado');
+    exit();
+}
+
 // Criar sessao
 $_SESSION['user_id'] = $user['id'];
 $_SESSION['user_nome'] = $user['nome'];

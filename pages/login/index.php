@@ -3,6 +3,8 @@ require_once __DIR__ . '/../../includes/global/auth.php';
 redirectIfLogged();
 
 $erro = $_GET['erro'] ?? '';
+$sucesso = $_GET['sucesso'] ?? '';
+$aviso = $_GET['aviso'] ?? '';
 $modo = $_GET['modo'] ?? 'login';
 $pageTitle = 'Entrar';
 ?>
@@ -35,6 +37,10 @@ $pageTitle = 'Entrar';
 
                 <?php if ($erro === 'credenciais'): ?>
                     <div class="alert alert-danger py-2">Email ou senha incorretos.</div>
+                <?php elseif ($erro === 'email_nao_verificado'): ?>
+                    <div class="alert alert-warning py-2">
+                        <i class="bi bi-exclamation-triangle"></i> Por favor, verifique seu email para ativar a conta.
+                    </div>
                 <?php elseif ($erro === 'campos' && $modo !== 'registro'): ?>
                     <div class="alert alert-danger py-2">Preencha todos os campos.</div>
                 <?php endif; ?>
@@ -83,6 +89,16 @@ $pageTitle = 'Entrar';
                     <div class="alert alert-danger py-2">Este email ja esta cadastrado.</div>
                 <?php elseif ($erro === 'senhas'): ?>
                     <div class="alert alert-danger py-2">As senhas nao coincidem.</div>
+                <?php elseif ($sucesso === 'verificacao_enviada'): ?>
+                    <div class="alert alert-success py-2">
+                        <i class="bi bi-check-circle"></i> Cadastro feito! Verifique seu email para confirmar a conta.
+                    </div>
+                <?php elseif ($aviso === 'email_nao_enviado'): ?>
+                    <div class="alert alert-warning py-2">
+                        <i class="bi bi-exclamation-triangle"></i> Cadastro feito, mas nao conseguimos enviar o email. Tente fazer login ou solicitar reenvio.
+                    </div>
+                <?php elseif ($erro === 'erro_servidor'): ?>
+                    <div class="alert alert-danger py-2">Erro ao processar seu cadastro. Tente novamente.</div>
                 <?php endif; ?>
 
                 <form action="register_process.php" method="POST" class="auth-form">
