@@ -151,6 +151,9 @@ function badgeNivel($n) {
                 <hr>
                 <strong>Descricao do problema:</strong>
                 <div class="p-3 bg-light rounded mt-2" id="vcObs"></div>
+                <hr>
+                <strong>Anexos:</strong>
+                <div id="vcAnexos" class="mt-2"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -201,6 +204,16 @@ function verChamado(c) {
     document.getElementById('vcStatus').textContent = c.status;
     document.getElementById('vcData').textContent = c.data + ' as ' + c.hora;
     document.getElementById('vcObs').textContent = c.obs || '(sem observacao)';
+    
+    // Carregar anexos via AJAX
+    const anexosDiv = document.getElementById('vcAnexos');
+    anexosDiv.innerHTML = '<small class="text-muted">Carregando...</small>';
+    
+    fetch('chamados/anexos_list.php?chamado_id=' + c.id)
+        .then(r => r.text())
+        .then(html => anexosDiv.innerHTML = html || '<small class="text-muted">Sem anexos</small>')
+        .catch(e => anexosDiv.innerHTML = '<small class="text-danger">Erro ao carregar anexos</small>');
+    
     new bootstrap.Modal(document.getElementById('modalVerChamado')).show();
 }
 

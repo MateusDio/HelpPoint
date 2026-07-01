@@ -113,6 +113,9 @@ function badgeStatusCli($s) {
                 <hr>
                 <strong>Descricao:</strong>
                 <div class="p-3 bg-light rounded mt-2" id="vcCliObs"></div>
+                <hr>
+                <strong>Anexos:</strong>
+                <div id="vcCliAnexos" class="mt-2"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -130,6 +133,16 @@ function verChamadoCli(c) {
     document.getElementById('vcCliLocal').textContent = c.local || '—';
     document.getElementById('vcCliData').textContent = c.data + ' as ' + c.hora;
     document.getElementById('vcCliObs').textContent = c.obs || '(sem observacao)';
+    
+    // Carregar anexos via AJAX
+    const anexosDiv = document.getElementById('vcCliAnexos');
+    anexosDiv.innerHTML = '<small class="text-muted">Carregando...</small>';
+    
+    fetch('anexos_list.php?chamado_id=' + c.id)
+        .then(r => r.text())
+        .then(html => anexosDiv.innerHTML = html || '<small class="text-muted">Sem anexos</small>')
+        .catch(e => anexosDiv.innerHTML = '<small class="text-danger">Erro ao carregar anexos</small>');
+    
     new bootstrap.Modal(document.getElementById('modalVerChamadoCli')).show();
 }
 </script>
@@ -138,7 +151,7 @@ function verChamadoCli(c) {
 <div class="modal fade" id="modalChamado" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <form action="chamados_process.php" method="POST" id="formNovoChamado">
+            <form action="chamados_process.php" method="POST" id="formNovoChamado" enctype="multipart/form-data">
                 <input type="hidden" name="acao" value="criar">
                 <input type="hidden" name="categoria_id" id="catSelecionadaId">
                 <input type="hidden" name="equipamento_id" id="equipSelecionadoId" value="">
@@ -258,6 +271,12 @@ function verChamadoCli(c) {
                         <label class="form-label">Descricao do problema <span class="text-danger">*</span></label>
                         <textarea class="form-control" name="obs" rows="4" placeholder="Conte com detalhes o que esta acontecendo..." required></textarea>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Anexos <small class="text-muted">(opcional)</small></label>
+                        <input type="file" class="form-control" name="anexos[]" multiple accept="image/*,.pdf,.doc,.docx" id="anexosInput">
+                        <small class="text-muted">Imagens, PDF e Word (máximo 5 arquivos, 5MB cada)</small>
+                        <div id="anexosPreview" class="mt-2"></div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -342,6 +361,24 @@ function filtrar(inputId, containerId, semId) {
 }
 filtrar('buscaCategoria', 'catCards', 'semResultado');
 filtrar('buscaEquipamento', 'equipCards', 'semResultadoEquip');
+
+// Preview de anexos
+document.getElementById('anexosInput').addEventListener('change', function() {
+    const preview = document.getElementById('anexosPreview');
+    preview.innerHTML = '';
+    let totalFiles = 0;
+    for (const file of this.files) {
+        totalFiles++;
+        if (totalFiles > 5) {
+            preview.innerHTML += '<div class="alert alert-warning small mt-2">Máximo 5 arquivos permitidos</div>';
+            break;
+        }
+        const div = document.createElement('div');
+        div.className = 'badge bg-info me-2 mb-2';
+        div.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+        preview.appendChild(div);
+    }
+});
 
 document.getElementById('modalChamado').addEventListener('hidden.bs.modal', function() {
     document.getElementById('formNovoChamado').reset();

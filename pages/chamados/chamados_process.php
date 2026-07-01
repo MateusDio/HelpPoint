@@ -32,6 +32,49 @@ if ($acao === 'criar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'eid' => $equipamento_id
     ]);
 
+    $chamadoId = $pdo->lastInsertId();
+
+    // Processar anexos se houver
+    if (isset($_FILES['anexos']) && is_array($_FILES['anexos']['name'])) {
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        $uploadDir = __DIR__ . '/../../uploads/chamados';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        for ($i = 0; $i < min(count($_FILES['anexos']['name']), 5); $i++) {
+            if ($_FILES['anexos']['error'][$i] !== UPLOAD_ERR_OK) continue;
+
+            $tmpName = $_FILES['anexos']['tmp_name'][$i];
+            $size = (int)$_FILES['anexos']['size'][$i];
+            $nomeOriginal = $_FILES['anexos']['name'][$i];
+
+            if ($size > 5 * 1024 * 1024) continue;
+
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $tmpName);
+            finfo_close($finfo);
+
+            if (!in_array($mime, $allowedMimes, true)) continue;
+
+            $ext = strtolower(pathinfo($nomeOriginal, PATHINFO_EXTENSION));
+            $nomeArquivo = 'anexo_' . $chamadoId . '_' . $userId . '_' . time() . '_' . $i . '.' . $ext;
+            $targetPath = $uploadDir . '/' . $nomeArquivo;
+
+            if (move_uploaded_file($tmpName, $targetPath)) {
+                $stmtAnexo = $pdo->prepare("INSERT INTO chamado_anexos (chamado_id, nome_arquivo, nome_original, tamanho, tipo_mime, user_id) VALUES (:cid, :na, :no, :s, :mime, :uid)");
+                $stmtAnexo->execute([
+                    'cid' => $chamadoId,
+                    'na' => $nomeArquivo,
+                    'no' => $nomeOriginal,
+                    's' => $size,
+                    'mime' => $mime,
+                    'uid' => $userId
+                ]);
+            }
+        }
+    }
+
     header('Location: index.php?sucesso=criado');
     exit();
 }
