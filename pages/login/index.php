@@ -47,6 +47,8 @@ $pageTitle = 'Entrar';
 
                 <?php if (isset($_GET['sucesso'])): ?>
                     <div class="alert alert-success py-2">Cadastro feito! Faca login.</div>
+                <?php elseif ($sucesso === 'senha_redefinida'): ?>
+                    <div class="alert alert-success py-2">Senha redefinida com sucesso! Faça login.</div>
                 <?php endif; ?>
 
                 <form action="login_process.php" method="POST" class="auth-form">
@@ -69,9 +71,10 @@ $pageTitle = 'Entrar';
                     </button>
                 </form>
 
-                <p class="auth-footer-link">
-                    Nao tem conta? <a href="#" onclick="toggleAuth('registro'); return false;">Cadastre-se</a>
-                </p>
+                <div class="d-flex justify-content-between mt-3 small">
+                    <a href="forgot_password.php">Esqueci a senha</a>
+                    <span>Nao tem conta? <a href="#" onclick="toggleAuth('registro'); return false;">Cadastre-se</a></span>
+                </div>
             </div>
 
             <!-- FORM: REGISTRO -->

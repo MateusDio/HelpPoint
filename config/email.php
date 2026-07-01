@@ -103,4 +103,94 @@ function validarTokenVerificacao($token, $pdo) {
     
     return $registro;
 }
+
+/**
+ * Enviar email de redefinição de senha
+ * @param string $destinatario Email do usuário
+ * @param string $nome Nome do usuário
+ * @param string $token Token de reset
+ * @return bool True se enviado com sucesso
+ */
+function enviarEmailRedefinicaoSenha($destinatario, $nome, $token) {
+    $link_reset = BASE_URL . '/pages/login/reset_password.php?token=' . urlencode($token);
+    $assunto = 'Redefinição de senha - HelpPoint';
+    
+    $mensagem = "
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset='UTF-8'>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #007bff; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+            .content { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
+            .footer { background: #f0f0f0; padding: 10px; text-align: center; font-size: 12px; border-radius: 0 0 5px 5px; }
+            .btn { display: inline-block; padding: 12px 24px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+            .btn:hover { background: #0056b3; }
+            .code { background: #e9ecef; padding: 10px; border-radius: 3px; font-family: monospace; word-break: break-all; }
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <div class='header'>
+                <h1>Redefinição de senha HelpPoint</h1>
+            </div>
+            <div class='content'>
+                <p>Olá <strong>" . htmlspecialchars($nome) . "</strong>,</p>
+                <p>Recebemos uma solicitação para redefinir a senha da sua conta. Clique no botão abaixo para continuar:</p>
+                <center>
+                    <a href='" . htmlspecialchars($link_reset) . "' class='btn'>Redefinir senha</a>
+                </center>
+                <p>Ou copie e cole este link no seu navegador:</p>
+                <div class='code'>" . htmlspecialchars($link_reset) . "</div>
+                <p style='color: #666; font-size: 12px;'>Este link expira em 1 hora.</p>
+                <p>Se você não solicitou a redefinição, ignore este email.</p>
+            </div>
+            <div class='footer'>
+                <p>&copy; " . date('Y') . " HelpPoint. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    ";
+    
+    $headers = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-type: text/html; charset=UTF-8\r\n";
+    $headers .= "From: " . MAIL_FROM_NAME . " <" . MAIL_FROM_EMAIL . ">\r\n";
+    $headers .= "Reply-To: " . MAIL_FROM_EMAIL . "\r\n";
+    
+    return @mail($destinatario, $assunto, $mensagem, $headers);
+}
+
+/**
+ * Validar token de reset de senha
+ * @param string $token Token a validar
+ * @param PDO $pdo Conexão PDO
+ * @return array|false Array de dados se válido, false caso contrário
+ */
+function validarTokenResetSenha($token, $pdo) {
+    $stmt = $pdo->prepare("
+        SELECT id, user_id, expira_em, usado_em
+        FROM password_reset
+        WHERE token = :token
+        LIMIT 1
+    ");
+    $stmt->execute(['token' => $token]);
+    $registro = $stmt->fetch();
+    
+    if (!$registro) {
+        return false;
+    }
+    
+    if ($registro['usado_em'] !== null) {
+        return ['error' => 'Este link já foi usado. Solicite um novo.'];
+    }
+    
+    if (strtotime($registro['expira_em']) < time()) {
+        return ['error' => 'Este link expirou. Solicite um novo.'];
+    }
+    
+    return $registro;
+}
 ?>
