@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS user (
     role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
     funcao VARCHAR(100) NULL,
     documento VARCHAR(50) NULL,
+    bio TEXT NULL,
+    avatar VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -1,10 +1,11 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 $__uid = (int)$_SESSION['user_id'];
-$__stmt = $pdo->prepare("SELECT nome, email FROM user WHERE id = :id LIMIT 1");
+$__stmt = $pdo->prepare("SELECT nome, email, avatar FROM user WHERE id = :id LIMIT 1");
 $__stmt->execute(['id' => $__uid]);
-$__me = $__stmt->fetch() ?: ['nome' => $_SESSION['user_nome'] ?? '', 'email' => ''];
+$__me = $__stmt->fetch() ?: ['nome' => $_SESSION['user_nome'] ?? '', 'email' => '', 'avatar' => ''];
 $__inicialCli = strtoupper(mb_substr($__me['nome'] ?? 'C', 0, 1));
+$__avatarCli = !empty($__me['avatar']) ? BASE_URL . '/uploads/avatars/' . htmlspecialchars($__me['avatar']) : '';
 ?>
 <header class="topbar topbar-cliente">
     <!-- Linha 1: logo + perfil -->
@@ -18,7 +19,11 @@ $__inicialCli = strtoupper(mb_substr($__me['nome'] ?? 'C', 0, 1));
 
             <div class="topbar-actions">
                 <button type="button" class="topbar-profile" data-bs-toggle="modal" data-bs-target="#modalConfigCliente">
-                    <div class="topbar-avatar"><?= htmlspecialchars($__inicialCli) ?></div>
+                    <?php if (!empty($__avatarCli)): ?>
+                        <img src="<?= $__avatarCli ?>" alt="Foto de perfil" class="topbar-avatar" style="object-fit: cover;">
+                    <?php else: ?>
+                        <div class="topbar-avatar"><?= htmlspecialchars($__inicialCli) ?></div>
+                    <?php endif; ?>
                     <div class="topbar-profile-info">
                         <span class="topbar-profile-name"><?= htmlspecialchars($__me['nome']) ?></span>
                         <span class="topbar-profile-email"><?= htmlspecialchars($__me['email']) ?></span>
@@ -57,7 +62,11 @@ $__inicialCli = strtoupper(mb_substr($__me['nome'] ?? 'C', 0, 1));
             </div>
             <div class="modal-body">
                 <div class="config-user-card">
-                    <div class="config-avatar"><?= htmlspecialchars($__inicialCli) ?></div>
+                    <?php if (!empty($__avatarCli)): ?>
+                        <img src="<?= $__avatarCli ?>" alt="Foto de perfil" class="config-avatar" style="object-fit: cover;">
+                    <?php else: ?>
+                        <div class="config-avatar"><?= htmlspecialchars($__inicialCli) ?></div>
+                    <?php endif; ?>
                     <div>
                         <div class="config-name"><?= htmlspecialchars($__me['nome']) ?></div>
                         <div class="config-email"><?= htmlspecialchars($__me['email']) ?></div>
